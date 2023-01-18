@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="240.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chat.controllers.AuthController">
+    <children>
+        <Label layoutX="10.0" layoutY="22.0" text="Логин" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="22.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+        </Label>
+        <Label layoutX="12.0" layoutY="72.0" text="Пароль" AnchorPane.leftAnchor="10.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+        </Label>
+        <Label layoutX="10.0" layoutY="122.0" text="Ник" AnchorPane.leftAnchor="10.0">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+        <TextField fx:id="loginField" layoutX="100.0" layoutY="10.0" prefHeight="0.0" prefWidth="110.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+        </TextField>
+        <PasswordField fx:id="passwordField" layoutX="100.0" layoutY="60.0" prefHeight="0.0" prefWidth="250.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="70.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+        </PasswordField>
+        <TextField fx:id="nickField" layoutX="100.0" layoutY="110.0" prefHeight="0.0" prefWidth="110.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="120.0">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </TextField>
+        <Button fx:id="authEnterButton" layoutX="10.0" layoutY="230.0" mnemonicParsing="false" onAction="#executeAuth" prefHeight="50.0" prefWidth="140.0" text="Войти" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0">
+         <font>
+            <Font size="18.0" />
+         </font></Button>
+        <Button fx:id="authRegistrationButton" layoutX="199.0" layoutY="175.0" mnemonicParsing="false" onAction="#executeReg" prefHeight="50.0" prefWidth="150.0" text="Зарегистрироваться" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <font>
+            <Font size="14.0" />
+         </font></Button>
+    </children>
+</AnchorPane>
