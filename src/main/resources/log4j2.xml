@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+    <Properties>
+        <Property name="C:\Users\Obodrit\Desktop\Work\IT\Java\GeekBrains\Chat\logs">logs</Property>
+    </Properties>
+
+    <Appenders>
+        <File name="FILE" filename="C:\Users\Obodrit\Desktop\Work\IT\Java\GeekBrains\Chat\logs\logfile.log" append="true">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L)%n%m%n" />
+        </File>
+
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L)%n%m%n" />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="ServerLogger" level="debug" />
+        <Root level="debug">
+            <AppenderRef ref="STDOUT" />
+            <AppenderRef ref="FILE" />
+        </Root>
+    </Loggers>
+</Configuration>
