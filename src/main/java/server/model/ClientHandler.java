@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.sql.*;
 import java.util.Arrays;
 
+import static command.CommandType.PRIVATE_MESSAGE;
+import static command.CommandType.PUBLIC_MESSAGE;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 
@@ -24,6 +26,7 @@ public class ClientHandler {
 
     private static Connection connection;
     private static Statement statement;
+
     private String userName;
     private String[] LPN = null;
 
@@ -171,6 +174,10 @@ public class ClientHandler {
         return command;
     }
 
+    public void sendCommand(Command command) throws IOException {
+        outputStream.writeObject(command);
+    }
+
     private void openSQLConnection() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -189,39 +196,27 @@ public class ClientHandler {
         }
     }
 
-    public void sendCommand(Command command) throws IOException {
-        outputStream.writeObject(command);
-    }
-
-    private void readMessages() throws IOException {
-        while (true) {
-            Command command = readCommand();
-            if (command == null) {
-                continue;
-            }
-            switch (command.getType()) {
-                case PRIVATE_MESSAGE: {
-                    PrivateMessageCommandData data = (PrivateMessageCommandData) command.getData();
-                    String recipient = data.getRecipient();
-                    String privateMessage = data.getMessage();
-                    server.sendPrivateMessage(this, recipient, privateMessage);
-                    break;
-                }
-                case PUBLIC_MESSAGE: {
-                    PublicMessageCommandData data = (PublicMessageCommandData) command.getData();
-                    this.server.sendPublicMessage(data.getMessage(), this);
-                    break;
-                }
-            }
-        }
-    }
-
     private void finishAuthenticate() throws IOException {
         sendCommand(Command.authOkCommand(userName));
         server.subscribe(this);
         Server.logger.log(Level.INFO,
                 "Подключение через порт {} прошло аутентификацию как пользователь {}",
                 clientSocket.getPort(), userName);
+    }
+
+    private void readMessages() throws IOException {
+        while (true) {
+            Command command = readCommand();
+            if (command != null) {
+                if (command.getType() == PRIVATE_MESSAGE) {
+                    PrivateMessageCommandData data = (PrivateMessageCommandData) command.getData();
+                    server.sendPrivateMessage(this, data.getRecipient(), data.getMessage());
+                } else if (command.getType() == PUBLIC_MESSAGE) {
+                    PublicMessageCommandData data = (PublicMessageCommandData) command.getData();
+                    this.server.sendPublicMessage(data.getMessage(), this);
+                }
+            }
+        }
     }
 
     public String getUserName() {

@@ -13,7 +13,7 @@ public class AuthTimeout extends TimerTask {
     @Override
     public void run() {
         try {
-            Thread.sleep(120000);
+            Thread.sleep(60000);
         } catch (InterruptedException e) {
             Server.logger.log(Level.ERROR, "Ошибка прерывания");
         }
