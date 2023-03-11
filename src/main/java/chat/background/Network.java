@@ -11,16 +11,19 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Network {
-    private final List<ReadMessageListener> listeners = new CopyOnWriteArrayList<>();
     private static Network INSTANCE;
+    private final List<ReadMessageListener> listeners = new CopyOnWriteArrayList<>();
+
     public static final String SERVER_HOST = "127.0.0.1";
     public static final int SERVER_PORT = 8189;
     private final String host;
     private final int port;
     private Socket socket;
+
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private Thread readMessageProcess;
+
     private boolean connected;
 
     private Network(String host, int port) {
@@ -54,17 +57,28 @@ public class Network {
         }
     }
 
-    public void sendPrivateMessage(String receiver, String message) throws IOException {
-        sendCommand(Command.privateMessageCommand(receiver, message));
-    }
+    public Thread startReadMessageProcess() {
+        Thread thread = new Thread(() -> {
+            while (true) {
+                try {
+                    if (Thread.currentThread().isInterrupted()) {
+                        return;
+                    }
 
-    public void sendCommand(Command command) throws IOException {
-        try {
-            outputStream.writeObject(command);
-        } catch (IOException e) {
-            Server.logger.log(Level.ERROR, "Не удалось отправить сообщение на сервер");
-            throw e;
-        }
+                    Command command = readCommand();
+                    for (ReadMessageListener listener : listeners) {
+                        listener.processReceivedCommand(command);
+                    }
+                } catch (IOException e) {
+                    Server.logger.log(Level.ERROR, "Не удалось получить сообщение от сервера");
+                    close();
+                    break;
+                }
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
+        return thread;
     }
 
     private Command readCommand() throws IOException {
@@ -79,37 +93,24 @@ public class Network {
         return command;
     }
 
-    public void sendPublicMessage(String message) throws IOException {
-        sendCommand(Command.publicMessageCommand(message));
-    }
-
     public void sendAuthMessage(String login, String password, String nick, Boolean isReg) throws IOException {
         sendCommand(Command.authCommand(login, password, nick, isReg));
     }
 
-    public Thread startReadMessageProcess() {
-        Thread thread = new Thread(() -> {
-            while (true) {
-                try {
-                    if (Thread.currentThread().isInterrupted()) {
-                        return;
-                    }
+    public void sendPrivateMessage(String receiver, String message) throws IOException {
+        sendCommand(Command.privateMessageCommand(receiver, message));
+    }
 
-                    Command command = readCommand();
-                    for (ReadMessageListener listener : listeners) {
-                        listener.processReceivedCommand(command);
-                    }
+    public void sendPublicMessage(String message) throws IOException {
+        sendCommand(Command.publicMessageCommand(message));
+    }
 
-                } catch (IOException e) {
-                    Server.logger.log(Level.ERROR, "Не удалось получить сообщение от сервера");
-                    close();
-                    break;
-                }
-            }
-        });
-        thread.setDaemon(true);
-        thread.start();
-        return thread;
+    public void sendCommand(Command command) {
+        try {
+            outputStream.writeObject(command);
+        } catch (IOException e) {
+            Server.logger.log(Level.ERROR, "Не удалось отправить сообщение на сервер");
+        }
     }
 
     public ReadMessageListener addReadMessageListener(ReadMessageListener listener) {
@@ -121,6 +122,10 @@ public class Network {
         this.listeners.remove(listener);
     }
 
+    public boolean isConnected() {
+        return connected;
+    }
+
     public void close() {
         try {
             connected = false;
@@ -129,9 +134,5 @@ public class Network {
         } catch (IOException e) {
             Server.logger.log(Level.ERROR, "Не удалось закрыть сетевое соединение");
         }
-    }
-
-    public boolean isConnected() {
-        return connected;
     }
 }

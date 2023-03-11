@@ -29,6 +29,16 @@ public class AuthController {
     public Button authEnterButton;
     public ReadMessageListener readMessageListener;
 
+    @FXML
+    public void executeAuth() {
+        execute(false);
+    }
+
+    @FXML
+    public void executeReg() {
+        execute(true);
+    }
+
     public void execute(Boolean isReg) {
         if (!isConnectedToServer()) {
             Server.logger.log(Level.ERROR, "Не удалось установить соединение с сервером");
@@ -50,16 +60,6 @@ public class AuthController {
         } catch (IOException e) {
             Server.logger.log(Level.ERROR, "Не удалось отправить сообщение");
         }
-    }
-
-    @FXML
-    public void executeAuth() {
-        execute(false);
-    }
-
-    @FXML
-    public void executeReg() {
-        execute(true);
     }
 
     public void initializeMessageHandler() {
@@ -84,11 +84,11 @@ public class AuthController {
         return network.isConnected() || network.connect();
     }
 
-    private Network getNetwork() {
-        return Network.getInstance();
-    }
-
     public void close() {
         getNetwork().removeReadMessageListener(readMessageListener);
+    }
+
+    private Network getNetwork() {
+        return Network.getInstance();
     }
 }

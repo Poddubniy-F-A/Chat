@@ -33,22 +33,23 @@ public class Server {
         }
     }
 
-    public synchronized void sendPublicMessage
-            (String message, ClientHandler sender) throws IOException {
+    public synchronized boolean isUserNameBusy(String userName) {
         for (ClientHandler client : clients) {
-            if (client != sender) {
-                client.sendCommand(Command.incomingMessageCommand(sender.getUserName(), message));
+            if (client.getUserName().equals(userName)) {
+                return true;
             }
         }
+        return false;
     }
 
-    public synchronized void sendPrivateMessage
-            (ClientHandler sender, String recipient, String privateMessage) throws IOException {
-        for (ClientHandler client : clients) {
-            if (client != sender && client.getUserName().equals(recipient)) {
-                client.sendCommand(Command.incomingMessageCommand(sender.getUserName(), privateMessage));
-            }
-        }
+    public synchronized void subscribe(ClientHandler clientHandler) throws IOException {
+        clients.add(clientHandler);
+        notifyUserListUpdated();
+    }
+
+    public synchronized void unsubscribe(ClientHandler clientHandler) throws IOException {
+        clients.remove(clientHandler);
+        notifyUserListUpdated();
     }
 
     private void notifyUserListUpdated() throws IOException {
@@ -70,22 +71,21 @@ public class Server {
         }
     }
 
-    public synchronized boolean isUserNameBusy(String userName) {
+    public synchronized void sendPublicMessage
+            (String message, ClientHandler sender) throws IOException {
         for (ClientHandler client : clients) {
-            if (client.getUserName().equals(userName)) {
-                return true;
+            if (client != sender) {
+                client.sendCommand(Command.incomingMessageCommand(sender.getUserName(), message));
             }
         }
-        return false;
     }
 
-    public synchronized void subscribe(ClientHandler clientHandler) throws IOException {
-        clients.add(clientHandler);
-        notifyUserListUpdated();
-    }
-
-    public synchronized void unsubscribe(ClientHandler clientHandler) throws IOException {
-        clients.remove(clientHandler);
-        notifyUserListUpdated();
+    public synchronized void sendPrivateMessage
+            (ClientHandler sender, String recipient, String privateMessage) throws IOException {
+        for (ClientHandler client : clients) {
+            if (client != sender && client.getUserName().equals(recipient)) {
+                client.sendCommand(Command.incomingMessageCommand(sender.getUserName(), privateMessage));
+            }
+        }
     }
 }
