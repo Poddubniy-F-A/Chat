@@ -11,11 +11,11 @@ public class IncomingMessageCommandData implements Serializable {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     public String getSender() {
         return sender;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

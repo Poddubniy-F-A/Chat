@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ChatController {
-    private static final int LAST_STRINGS = 100;
+    private static final int HISTORY_SIZE = 100;
 
     private String login;
 
@@ -45,45 +45,11 @@ public class ChatController {
 
                 updateHistory(data.getSender(), data.getMessage());
             } else if (command.getType() == CommandType.UPDATE_USERS_LIST) {
-                Platform.runLater(() -> {
-                    userList.setItems(FXCollections.observableArrayList(
-                            ((UpdateUserListCommandData) command.getData()).getUsers()
-                    ));
-                });
+                Platform.runLater(() -> userList.setItems(FXCollections.observableArrayList(
+                        ((UpdateUserListCommandData) command.getData()).getUsers()
+                )));
             }
         });
-    }
-
-    public void initializeHistory(String login) {
-        this.login = login;
-
-        File file = new File("History/" + login);
-        try {
-            if (file.createNewFile()) {
-                return;
-            }
-        } catch (Exception e) {
-            Server.logger.log(Level.ERROR, "Ошибка при создании файла истории");
-        }
-
-        try {
-            List<String> history = new ArrayList<>();
-
-            ReversedLinesFileReader reader = new ReversedLinesFileReader(file, StandardCharsets.UTF_8);
-            for (int i = 0; i < LAST_STRINGS; i++) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
-                }
-                history.add(line);
-            }
-
-            for (int i = history.size() - 1; i >= 0; i--) {
-                chatTextArea.appendText(history.get(i) + System.lineSeparator());
-            }
-        } catch (Exception e) {
-            Server.logger.log(Level.ERROR, "Ошибка при открытии файла истории");
-        }
     }
 
     public void sendMessage() {
@@ -127,6 +93,38 @@ public class ChatController {
             OutputStream outputStream = new FileOutputStream("History/" + login, true);
             outputStream.write(record.getBytes(StandardCharsets.UTF_8));
             outputStream.close();
+        } catch (Exception e) {
+            Server.logger.log(Level.ERROR, "Ошибка при открытии файла истории");
+        }
+    }
+
+    public void initializeHistory(String login) {
+        this.login = login;
+
+        File file = new File("History/" + login);
+        try {
+            if (file.createNewFile()) {
+                return;
+            }
+        } catch (Exception e) {
+            Server.logger.log(Level.ERROR, "Ошибка при создании файла истории");
+        }
+
+        try {
+            List<String> history = new ArrayList<>();
+
+            ReversedLinesFileReader reader = new ReversedLinesFileReader(file, StandardCharsets.UTF_8);
+            for (int i = 0; i < HISTORY_SIZE; i++) {
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                history.add(line);
+            }
+
+            for (int i = history.size() - 1; i >= 0; i--) {
+                chatTextArea.appendText(history.get(i) + System.lineSeparator());
+            }
         } catch (Exception e) {
             Server.logger.log(Level.ERROR, "Ошибка при открытии файла истории");
         }

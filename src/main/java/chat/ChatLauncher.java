@@ -17,6 +17,7 @@ import java.util.Timer;
 
 public class ChatLauncher extends Application {
     private static ChatLauncher INSTANCE;
+
     private Stage chatStage;
     private Stage authStage;
     private FXMLLoader chatWindowLoader;
@@ -51,10 +52,6 @@ public class ChatLauncher extends Application {
         getAuthController().initializeMessageHandler();
     }
 
-    public static void main(String[] args) {
-        launch();
-    }
-
     public void switchToChatWindow(String userName, String login) {
         getAuthController().close();
         getAuthStage().close();
@@ -66,12 +63,12 @@ public class ChatLauncher extends Application {
         getChatStage().show();
     }
 
-    public void makeErrorDialog(Alert.AlertType dialogType, String title, String message) {
-        Alert alert = new Alert(dialogType);
-        alert.initOwner(ChatLauncher.getInstance().getChatStage());
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-        alert.showAndWait();
+    public AuthController getAuthController() {
+        return authLoader.getController();
+    }
+
+    public ChatController getChatController() {
+        return chatWindowLoader.getController();
     }
 
     public Stage getAuthStage() {
@@ -82,12 +79,12 @@ public class ChatLauncher extends Application {
         return chatStage;
     }
 
-    public ChatController getChatController() {
-        return chatWindowLoader.getController();
-    }
-
-    public AuthController getAuthController() {
-        return authLoader.getController();
+    public void makeErrorDialog(Alert.AlertType dialogType, String title, String message) {
+        Alert alert = new Alert(dialogType);
+        alert.initOwner(ChatLauncher.getInstance().getChatStage());
+        alert.setTitle(title);
+        alert.setHeaderText(message);
+        alert.showAndWait();
     }
 
     public static ChatLauncher getInstance() {

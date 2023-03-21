@@ -7,24 +7,26 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Command implements Serializable {
-    private Serializable data;
     private CommandType type;
+    private Serializable data;
 
     public static Command authCommand(String login, String password, String nick, Boolean isReg) {
         Command command = new Command();
-        command.data = new AuthCommandData(login, password, nick);
         if (isReg) {
             command.type = CommandType.REG;
         } else {
             command.type = CommandType.ENTER;
         }
+        command.data = new AuthCommandData(login, password, nick);
+
         return command;
     }
 
     public static Command authOkCommand(String userName) {
         Command command = new Command();
-        command.data = new AuthOkCommandData(userName);
         command.type = CommandType.AUTH_OK;
+        command.data = new AuthOkCommandData(userName);
+
         return command;
     }
 
@@ -32,6 +34,7 @@ public class Command implements Serializable {
         Command command = new Command();
         command.type = CommandType.ERROR;
         command.data = new ErrorCommandData(dialogType, title, message);
+
         return command;
     }
 
@@ -39,6 +42,7 @@ public class Command implements Serializable {
         Command command = new Command();
         command.type = CommandType.PUBLIC_MESSAGE;
         command.data = new PublicMessageCommandData(message);
+
         return command;
     }
 
@@ -46,6 +50,7 @@ public class Command implements Serializable {
         Command command = new Command();
         command.type = CommandType.PRIVATE_MESSAGE;
         command.data = new PrivateMessageCommandData(recipient, message);
+
         return command;
     }
 
@@ -53,6 +58,7 @@ public class Command implements Serializable {
         Command command = new Command();
         command.type = CommandType.INCOMING_MESSAGE;
         command.data = new IncomingMessageCommandData(sender, message);
+
         return command;
     }
 
@@ -60,14 +66,15 @@ public class Command implements Serializable {
         Command command = new Command();
         command.type = CommandType.UPDATE_USERS_LIST;
         command.data = new UpdateUserListCommandData(users);
-        return command;
-    }
 
-    public Serializable getData() {
-        return data;
+        return command;
     }
 
     public CommandType getType() {
         return type;
+    }
+
+    public Serializable getData() {
+        return data;
     }
 }
